@@ -1,4 +1,4 @@
-# SoulSync - Full App (v2.0)
+# SoulSync - Full App (v2.1)
 # By: Hadia, a gentle mental health companion
 # Built using Streamlit
 
@@ -40,15 +40,23 @@ if "journal" not in st.session_state:
 if "chat_log" not in st.session_state:
     st.session_state.chat_log = []
 
-# ---------------------------------- COMPANION RESPONSES ----------------------------------
-responses = [
-    "That sounds really tough, bestie. I'm proud of you for sharing it ❤️",
-    "Omg you're literally trying your best and that's iconic of you 😭",
-    "Even clouds get heavy. You're allowed to rest. ☁️",
-    "Moony is here with open arms. Wanna hug it out? 🫂",
-    "That matters. *You* matter. Never forget that."
-]
+# ---------------------------------- SMART CHATBOT LOGIC ----------------------------------
+def get_response(user_input):
+    user_input = user_input.lower()
+    if "sad" in user_input:
+        return "Oh no bestie 😢 Want a hug or should I just listen?"
+    elif "anxious" in user_input or "panic" in user_input:
+        return "Deep breaths, okay? In... out... You're safe now. 💗"
+    elif "tired" in user_input:
+        return "You deserve to rest, like fr. Moony's curling up next to you 🐰🛌"
+    elif "happy" in user_input:
+        return "YAY bestie!! I'm so proud of you ✨ Wanna celebrate with sparkles?"
+    elif "numb" in user_input:
+        return "Even silence means something. I’m still here with you. 💞"
+    else:
+        return "That’s totally valid. I’m here if you wanna keep talking ✨"
 
+# ---------------------------------- COMPANION RESPONSES ----------------------------------
 quotes = [
     "You are enough, exactly as you are. ",
     "Your feelings are valid. Even the messy ones.",
@@ -84,16 +92,16 @@ if menu == "Chat":
     st.subheader(f"Chat with {st.session_state.name} {st.session_state.animal}")
     for entry in st.session_state.chat_log:
         st.markdown(entry, unsafe_allow_html=True)
+
     user_input = st.text_input("Talk to your companion:", key="chat_input")
+
     if st.button("Send"):
         if user_input:
             st.session_state.chat_log.append(f"<b>You:</b> {user_input}")
-            reply = f"<b>{st.session_state.name} {st.session_state.animal}:</b> {random.choice(responses)}"
-            st.session_state.chat_log.append(reply)
+            reply = get_response(user_input)
+            st.session_state.chat_log.append(f"<b>{st.session_state.name} {st.session_state.animal}:</b> {reply}")
             st.session_state.chat_input = ""
 
-
-    # Hug & Kiss Buttons
     if st.button("🤍 Send Hug"):
         st.markdown("""
         <div class='hug-screen'>
