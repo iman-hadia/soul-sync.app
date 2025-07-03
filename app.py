@@ -84,13 +84,13 @@ if menu == "Chat":
     st.subheader(f"Chat with {st.session_state.name} {st.session_state.animal}")
     for entry in st.session_state.chat_log:
         st.markdown(entry, unsafe_allow_html=True)
-    user_input = st.text_input("Talk to your companion:", key="chat")
+    user_input = st.text_input("Talk to your companion:", key="chat_input")
     if st.button("Send"):
         if user_input:
             st.session_state.chat_log.append(f"<b>You:</b> {user_input}")
             reply = f"<b>{st.session_state.name} {st.session_state.animal}:</b> {random.choice(responses)}"
             st.session_state.chat_log.append(reply)
-            st.session_state.chat = ""
+            st.session_state.chat_input = ""
 
 
     # Hug & Kiss Buttons
