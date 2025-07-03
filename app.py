@@ -90,7 +90,7 @@ if menu == "Chat":
             st.session_state.chat_log.append(f"<b>You:</b> {user_input}")
             reply = f"<b>{st.session_state.name} {st.session_state.animal}:</b> {random.choice(responses)}"
             st.session_state.chat_log.append(reply)
-            st.experimental_rerun()
+            st.rerun()
 
     # Hug & Kiss Buttons
     if st.button("🤍 Send Hug"):
