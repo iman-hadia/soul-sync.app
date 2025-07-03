@@ -100,7 +100,6 @@ if menu == "Chat":
             st.session_state.chat_log.append(f"<b>You:</b> {user_input}")
             reply = get_response(user_input)
             st.session_state.chat_log.append(f"<b>{st.session_state.name} {st.session_state.animal}:</b> {reply}")
-            st.experimental_rerun()
 
     if st.button("🤍 Send Hug"):
         st.markdown("""
@@ -168,3 +167,4 @@ if menu == "About SoulSync":
 
     Made with stardust, code, and compassion by Hadia 🧊
     """)
+
