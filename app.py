@@ -1,99 +1,161 @@
-# SoulSync: A Mental Health Comfort App with Streamlit
+# SoulSync - Full App (v2.0)
+# By: Hadia & ChatGPT, a gentle mental health companion
+# Built using Streamlit
 
 import streamlit as st
 import random
-from PIL import Image
-import os
+from datetime import datetime
 
-# Load animal avatars
-animal_emojis = {
-    "Bunny": "🐰",
-    "Puppy": "🐶",
-    "Cat": "🐱",
-    "Chick": "🐥",
-    "Fish": "🐠",
-    "Panda": "🐼",
-    "Parrot": "🦜",
-    "Turtle": "🐢"
-}
+# ---------------------------------- CONFIG & STYLING ----------------------------------
+st.set_page_config(page_title="SoulSync", page_icon="🧊", layout="wide")
+st.markdown("""
+    <style>
+        body {
+            background: linear-gradient(to right, #f9f5f0, #ffe4e1);
+        }
+        .main {
+            font-family: 'Poppins', sans-serif;
+        }
+        .hug-screen, .kiss-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #ffd6e8;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-# Streamlit Page Config
-st.set_page_config(
-    page_title="SoulSync",
-    page_icon="🌺",
-    layout="centered",
-    initial_sidebar_state="expanded"
-)
-
-# Session State
+# ---------------------------------- STATE VARIABLES ----------------------------------
 if "animal" not in st.session_state:
-    st.session_state.animal = None
+    st.session_state.animal = "🐰"
 if "name" not in st.session_state:
-    st.session_state.name = None
+    st.session_state.name = "Moony"
+if "journal" not in st.session_state:
+    st.session_state.journal = []
+if "chat_log" not in st.session_state:
+    st.session_state.chat_log = []
 
-# Animal Companion Selection
-st.title("SoulSync 🌺")
-st.subheader("A gentle space for your feelings")
-st.markdown("---")
+# ---------------------------------- COMPANION RESPONSES ----------------------------------
+responses = [
+    "That sounds really tough, bestie. I'm proud of you for sharing it ❤️",
+    "Omg you're literally trying your best and that's iconic of you 😭",
+    "Even clouds get heavy. You're allowed to rest. ☁️",
+    "Moony is here with open arms. Wanna hug it out? 🫂",
+    "That matters. *You* matter. Never forget that."
+]
 
-if not st.session_state.animal:
-    st.markdown("### Choose your emotional support animal:")
-    selected = st.selectbox("Pick your companion", list(animal_emojis.keys()))
-    name = st.text_input("Give your companion a name (e.g., Moony)")
+quotes = [
+    "You are enough, exactly as you are. ",
+    "Your feelings are valid. Even the messy ones.",
+    "Healing isn't linear. You're allowed to wobble.",
+    "You’re not alone. Not now, not ever. ",
+    "Your softness is your strength."
+]
 
-    if st.button("Start With My Companion") and name:
-        st.session_state.animal = selected
+# ---------------------------------- PAGES ----------------------------------
+menu = st.sidebar.radio("Go to:", ["Home", "Choose Companion", "Chat", "Mood Check-In", "Journal", "About SoulSync"])
+
+# ---------------------------------- HOME ----------------------------------
+if menu == "Home":
+    st.title("Welcome to SoulSync ✨")
+    st.subheader(f"{random.choice(quotes)}")
+    st.write(f"Hey there! {st.session_state.name} {st.session_state.animal} is so happy to see you today.")
+    st.image("https://media.tenor.com/lsYv4I4ZkgoAAAAi/cute-love.gif", width=200)
+
+# ---------------------------------- COMPANION PICKER ----------------------------------
+elist = ["🐰", "🐶", "🐱", "🐥", "🐠", "🐼", "🦜", "🐢"]
+
+if menu == "Choose Companion":
+    st.subheader("Choose your emotional support animal")
+    animal = st.selectbox("Pick an animal:", elist)
+    name = st.text_input("Name your companion:", value="Moony")
+    if st.button("Save Companion"):
+        st.session_state.animal = animal
         st.session_state.name = name
-        st.success(f"{animal_emojis[selected]} {name} is now with you.")
-        st.experimental_rerun()
-else:
-    # Welcome Message
-    animal = st.session_state.animal
-    name = st.session_state.name
-    emoji = animal_emojis[animal]
-    st.markdown(f"### Hi, I'm {name} {emoji}. I'm right here with you.")
-    st.caption("Want to talk? Share your feelings below.")
+        st.success(f"Saved! Say hi to {name} {animal}")
 
-    # Mood Check-In
-    mood = st.selectbox("How are you feeling today?", ["", "🙂 Happy", "😞 Sad", "😕 Anxious", "😶 Numb"])
-    if mood:
-        if "Happy" in mood:
-            st.success(f"{name} {emoji} says: 'That's amazing! Keep soaking in the sunshine!' ☀️")
-        elif "Sad" in mood:
-            st.info(f"{name} {emoji} says: 'It’s okay to feel sad. I’m here with you.'")
-        elif "Anxious" in mood:
-            st.warning(f"{name} {emoji} says: 'Deep breaths, bestie. You’re not alone in this.'")
-        elif "Numb" in mood:
-            st.info(f"{name} {emoji} says: 'Even feeling nothing is still a feeling. Let’s sit together in this.'")
+# ---------------------------------- CHAT ----------------------------------
+if menu == "Chat":
+    st.subheader(f"Chat with {st.session_state.name} {st.session_state.animal}")
+    for entry in st.session_state.chat_log:
+        st.markdown(entry, unsafe_allow_html=True)
+    user_input = st.text_input("Talk to your companion:", key="chat")
+    if st.button("Send"):
+        if user_input:
+            st.session_state.chat_log.append(f"<b>You:</b> {user_input}")
+            reply = f"<b>{st.session_state.name} {st.session_state.animal}:</b> {random.choice(responses)}"
+            st.session_state.chat_log.append(reply)
+            st.experimental_rerun()
 
-    # Chatbot
-    st.markdown("---")
-    st.markdown(f"#### Talk to {name} {emoji}:")
-    user_input = st.text_input("What's on your mind?")
-    if user_input:
-        responses = [
-            f"{name} {emoji} says: That sounds tough. Want to tell me more?",
-            f"{name} {emoji} says: I’m proud of you for even sharing this.",
-            f"{name} {emoji} says: You're doing better than you think.",
-            f"{name} {emoji} says: Totally valid. I’m here for you."
-        ]
-        st.write(random.choice(responses))
+    # Hug & Kiss Buttons
+    if st.button("🤍 Send Hug"):
+        st.markdown("""
+        <div class='hug-screen'>
+            <h2>Here’s your hug. You’re safe now. ❤️</h2>
+            <img src='https://media.tenor.com/hkWjFCS5FAYAAAAi/bunny-cute.gif' width='200'>
+        </div>
+        <script>
+            setTimeout(() => window.location.reload(), 4000);
+        </script>
+        """, unsafe_allow_html=True)
 
-    # Hug/Kiss Buttons
-    st.markdown("---")
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("🫂 Send Virtual Hug"):
-            st.markdown(f"### {name} {emoji} is sending you a warm, fluffy hug 🫂")
-            st.image(f"https://placekitten.com/300/300", caption="*hug mode engaged*")
-    with col2:
-        if st.button("🫥 Send Kiss"):
-            st.markdown(f"### {name} {emoji} blows a gentle kiss your way 💋")
-            st.balloons()
-            st.success("Come back anytime. I’ll be here.")
+    if st.button("Send Kiss 🦋"):
+        st.markdown("""
+        <div class='kiss-screen'>
+            <h2>{0} {1} is blowing you a kiss! 😘</h2>
+            <img src='https://media.tenor.com/6I4LFHGnZJ0AAAAi/peach-goma-love.gif' width='200'>
+            <p><i>Come back anytime. I’ll be here.</i></p>
+        </div>
+        <script>
+            setTimeout(() => window.location.reload(), 4000);
+        </script>
+        """.format(st.session_state.name, st.session_state.animal), unsafe_allow_html=True)
 
-    # Reset
-    if st.button("🔄 Choose Another Companion"):
-        st.session_state.animal = None
-        st.session_state.name = None
-        st.experimental_rerun()
+# ---------------------------------- MOOD ----------------------------------
+if menu == "Mood Check-In":
+    st.subheader("How are you feeling today?")
+    mood = st.selectbox("Pick a mood:", ["😭 Sad", "😐 Numb", "😡 Angry", "😊 Happy", "✨ Hopeful"])
+    st.write(f"{st.session_state.name} {st.session_state.animal} says:")
+    if mood == "😭 Sad":
+        st.info("Tears are not weakness. I'm here with you.")
+    elif mood == "😐 Numb":
+        st.info("Even when it’s quiet inside you, I’m still listening.")
+    elif mood == "😡 Angry":
+        st.info("You’re allowed to feel fire. Let’s breathe through it.")
+    elif mood == "😊 Happy":
+        st.info("YAY! I'm happy dancing with you bestie 🥺")
+    elif mood == "✨ Hopeful":
+        st.info("Hope is a soft glow. Keep following it.")
+
+# ---------------------------------- JOURNAL ----------------------------------
+if menu == "Journal":
+    st.subheader("Write your heart out")
+    title = st.text_input("Entry title")
+    content = st.text_area("Your thoughts")
+    if st.button("Save Entry"):
+        timestamp = datetime.now().strftime("%d %b %Y | %I:%M %p")
+        st.session_state.journal.append((title, content, timestamp))
+        st.success("Saved to your memory vault 📃")
+    if st.session_state.journal:
+        st.markdown("---")
+        for i, (t, c, ts) in enumerate(reversed(st.session_state.journal)):
+            st.markdown(f"**{t}**  ")
+            st.markdown(f"*{ts}*  ")
+            st.markdown(f"> {c}")
+            st.markdown("---")
+
+# ---------------------------------- ABOUT ----------------------------------
+if menu == "About SoulSync":
+    st.title("About SoulSync")
+    st.write("""
+    SoulSync is a safe, sparkly corner of the internet made for when you need a hug, a friend,
+    or just a moment to breathe. Your companion is always here — listening, comforting, and
+    growing with you. Whether you're joyful or hurting, SoulSync meets you where you are.
+
+    Made with stardust, code, and compassion by Hadia 🧊
+    """)
